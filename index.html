@@ -1,0 +1,1235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>For Ma'am Rosaroso</title>
+    <meta name="description" content="A Valentine's Day appreciation from Section Barbera to Ma'am Mary Rose Rosaroso">
+
+    <!-- FONTS -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@500;700&family=Fira+Code:wght@400;500&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* ===========================================
+           CSS VARIABLES
+           =========================================== */
+        :root {
+            --pastel-pink: #ffd1dc;
+            --hot-pink: #ff6b9a;
+            --soft-rose: #ffb3c6;
+            --blush: #fff0f3;
+            --white: #ffffff;
+            --glass-bg: rgba(255, 255, 255, 0.72);
+            --glass-border: rgba(255, 255, 255, 0.88);
+            --code-bg: #1e1e2e;
+            --code-surface: #252537;
+            --code-line: #2a2a3c;
+            --code-comment: #6c7086;
+            --code-keyword: #ff6b9a;
+            --code-string: #ffb3c6;
+            --code-type: #f9a8d4;
+            --code-fn: #ffd1dc;
+            --code-text: #e8e0e6;
+            --muted: #5a5a5a;
+            --accent-gradient: linear-gradient(135deg, #ff6b9a, #ffb199);
+        }
+
+        /* ===========================================
+           RESET & BASE
+           =========================================== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        html, body {
+            height: 100%;
+            font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            overflow: hidden;
+        }
+
+        body {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--code-bg);
+        }
+
+        /* ===========================================
+           ANIMATED CODE-RAIN BACKGROUND
+           =========================================== */
+        .bg-canvas {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            background: linear-gradient(160deg, #1a1a2e 0%, #16213e 40%, #1e1e2e 100%);
+        }
+
+        .bg-canvas::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image:
+                linear-gradient(rgba(255, 107, 154, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 107, 154, 0.04) 1px, transparent 1px);
+            background-size: 60px 60px;
+            animation: gridShift 20s linear infinite;
+        }
+
+        @keyframes gridShift { to { background-position: 60px 60px; } }
+
+        .code-fragment {
+            position: absolute;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: rgba(255, 107, 154, 0.12);
+            white-space: nowrap;
+            animation: floatUp linear infinite;
+            pointer-events: none;
+            user-select: none;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(110vh) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-10vh) rotate(4deg); opacity: 0; }
+        }
+
+        /* Valentine BG (Phase 2) */
+        .bg-valentine {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            overflow: hidden;
+            background: linear-gradient(160deg, #fff0f3 0%, #ffd1dc 40%, #ffb3c6 80%, #fff0f3 100%);
+            opacity: 0;
+            transition: opacity 1.2s ease;
+            pointer-events: none;
+        }
+
+        .bg-valentine.active { opacity: 1; pointer-events: auto; }
+
+        .floating-heart {
+            position: absolute;
+            animation: floatHeart linear infinite;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        .floating-heart svg { fill: rgba(255, 107, 154, 0.18); }
+
+        @keyframes floatHeart {
+            0% { transform: translateY(110vh) scale(0.5) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) scale(1.1) rotate(25deg); opacity: 0; }
+        }
+
+        /* ===========================================
+           PHASE 1: PINK IDE
+           =========================================== */
+        #phase-ide {
+            position: relative;
+            z-index: 2;
+            width: min(960px, 96vw);
+            max-height: 94vh;
+            display: flex;
+            flex-direction: column;
+            border-radius: 14px;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.06);
+            background: var(--code-bg);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        #phase-ide.hidden {
+            opacity: 0;
+            transform: scale(0.95) translateY(20px);
+            pointer-events: none;
+            position: absolute;
+        }
+
+        /* Title Bar */
+        .ide-titlebar {
+            display: flex;
+            align-items: center;
+            padding: 10px 14px;
+            background: #181825;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+            gap: 10px;
+        }
+
+        .dots { display: flex; gap: 7px; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot-red { background: #ff5f57; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #28c940; }
+
+        .ide-filename {
+            flex: 1;
+            text-align: center;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.82rem;
+            color: var(--code-comment);
+        }
+
+        .ide-filename svg { width: 14px; height: 14px; vertical-align: -2px; margin-right: 4px; fill: var(--code-keyword); }
+
+        /* IDE Body */
+        .ide-body { display: flex; flex: 1; min-height: 0; }
+
+        /* Sidebar */
+        .ide-sidebar {
+            width: 44px;
+            background: #181825;
+            border-right: 1px solid rgba(255, 255, 255, 0.05);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 12px;
+            gap: 16px;
+        }
+
+        .sidebar-icon { width: 20px; height: 20px; opacity: 0.35; }
+        .sidebar-icon.active { opacity: 0.8; }
+        .sidebar-icon svg { width: 100%; height: 100%; fill: var(--code-text); }
+
+        /* File tree */
+        .ide-filetree {
+            width: 170px;
+            background: #1b1b2f;
+            border-right: 1px solid rgba(255, 255, 255, 0.04);
+            padding: 12px 10px;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--code-comment);
+            overflow: hidden;
+        }
+
+        .filetree-header {
+            text-transform: uppercase;
+            font-size: 0.62rem;
+            letter-spacing: 1.2px;
+            color: rgba(255, 255, 255, 0.3);
+            margin-bottom: 10px;
+        }
+
+        .filetree-item {
+            padding: 3px 6px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 2px;
+        }
+
+        .filetree-item svg { width: 13px; height: 13px; flex-shrink: 0; }
+        .filetree-item.active { background: rgba(255, 107, 154, 0.12); color: var(--code-keyword); }
+        .filetree-item .folder-icon { fill: #ffbd2e; }
+        .filetree-item .file-icon { fill: var(--code-keyword); }
+
+        /* Editor */
+        .ide-editor {
+            flex: 1;
+            padding: 16px 14px 16px 0;
+            overflow-y: auto;
+            min-height: 0;
+        }
+
+        .code-line {
+            display: flex;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.8rem;
+            line-height: 1.8;
+            min-height: 1.8em;
+        }
+
+        .line-num {
+            width: 44px;
+            text-align: right;
+            padding-right: 16px;
+            color: rgba(255, 255, 255, 0.15);
+            user-select: none;
+            flex-shrink: 0;
+        }
+
+        .line-content { color: var(--code-text); }
+        .kw { color: var(--code-keyword); font-weight: 500; }
+        .ty { color: var(--code-type); }
+        .str { color: var(--code-string); }
+        .cm { color: var(--code-comment); font-style: italic; }
+        .fn { color: var(--code-fn); }
+        .br { color: rgba(255, 255, 255, 0.35); }
+        .indent { display: inline-block; }
+        .i1 { width: 2em; }
+        .i2 { width: 4em; }
+        .i3 { width: 6em; }
+
+        /* IDE Footer */
+        .ide-footer {
+            background: #181825;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+            padding: 10px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .terminal-status {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.75rem;
+            color: var(--code-comment);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .terminal-status svg { width: 14px; height: 14px; fill: var(--code-comment); }
+
+        .btn-run {
+            padding: 9px 24px;
+            border: none;
+            border-radius: 8px;
+            background: var(--accent-gradient);
+            color: white;
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            box-shadow: 0 4px 18px rgba(255, 107, 154, 0.3);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-run:hover {
+            transform: translateY(-2px) scale(1.03);
+            box-shadow: 0 8px 28px rgba(255, 107, 154, 0.45);
+        }
+
+        .btn-run:active { transform: scale(0.97); }
+        .btn-run svg { width: 15px; height: 15px; fill: white; }
+
+        .btn-run::after {
+            content: '';
+            position: absolute;
+            inset: -2px;
+            border-radius: 10px;
+            background: var(--accent-gradient);
+            z-index: -1;
+            filter: blur(12px);
+            opacity: 0.4;
+            animation: glowPulse 2s ease-in-out infinite;
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { opacity: 0.3; transform: scale(1); }
+            50% { opacity: 0.55; transform: scale(1.05); }
+        }
+
+        /* Compile Overlay */
+        .compile-overlay {
+            position: absolute;
+            inset: 0;
+            background: rgba(24, 24, 37, 0.95);
+            z-index: 10;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 16px;
+            border-radius: 14px;
+        }
+
+        .compile-overlay.active { display: flex; }
+
+        .compile-text {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.88rem;
+            color: var(--code-keyword);
+        }
+
+        .compile-bar {
+            width: 240px;
+            height: 5px;
+            background: var(--code-line);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .compile-fill {
+            width: 0%;
+            height: 100%;
+            background: var(--accent-gradient);
+            border-radius: 3px;
+            transition: width 0.15s linear;
+        }
+
+        .terminal-lines {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.7rem;
+            color: var(--code-comment);
+            text-align: left;
+            max-width: 340px;
+            line-height: 1.65;
+        }
+
+        .terminal-lines .success { color: #28c940; }
+
+        /* ===========================================
+           PHASE 2: VALENTINE CARD
+           =========================================== */
+        #phase-card {
+            position: relative;
+            z-index: 2;
+            width: min(900px, 96vw);
+            max-height: 94vh;
+            background: var(--glass-bg);
+            backdrop-filter: blur(14px) saturate(1.1);
+            -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 20px 50px rgba(255, 107, 154, 0.12), 0 0 0 1px rgba(255, 255, 255, 0.2);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+            opacity: 0;
+            transform: scale(0.92) translateY(30px);
+            transition: opacity 0.8s ease, transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        #phase-card.visible {
+            display: flex;
+            opacity: 1;
+            transform: none;
+        }
+
+        /* Card title bar */
+        .card-titlebar {
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+        }
+
+        .card-app-title {
+            font-family: 'Fira Code', monospace;
+            font-size: 1.05rem;
+            color: var(--muted);
+        }
+
+        /* Music control */
+        .music-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-music {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .btn-music:hover { background: rgba(255, 107, 154, 0.1); }
+        .btn-music svg { width: 20px; height: 20px; fill: var(--hot-pink); }
+
+        .music-label {
+            font-family: 'Fira Code', monospace;
+            font-size: 0.65rem;
+            color: var(--code-comment);
+        }
+
+        /* Content wrapper */
+        .content-wrapper {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            flex: 1;
+            align-items: stretch; /* Allow children to fill height */
+            min-height: 0; /* Critical for flex scrolling */
+            overflow: hidden;
+        }
+
+        .photo-section {
+            flex: 0 0 auto; /* Don't grow or shrink */
+            max-width: 45%;
+            /* Removed background/shadow/border-radius from container to avoid "outline" */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transform: rotate(-1.5deg);
+        }
+
+        .photo-section img {
+            width: auto;
+            height: auto;
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            display: block;
+            border-radius: 12px;
+            box-shadow: 0 8px 18px rgba(255, 107, 154, 0.15); /* Shadow on image now */
+        }
+
+        .final-mode .photo-section { transform: none; }
+
+        .text-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+            min-height: 0; /* Critical for scrolling */
+            overflow-y: auto; /* Enable scrolling */
+            padding-right: 8px; /* Space for scrollbar */
+        }
+
+        .note {
+            background: transparent;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 1rem;
+            line-height: 1.6;
+            color: #333;
+            white-space: pre-wrap;
+            flex-shrink: 0; /* Prevent text from being compressed */
+        }
+
+        /* Card footer */
+        .card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 16px;
+            background: transparent;
+            border-top: 1px solid rgba(255, 107, 154, 0.08);
+            flex-shrink: 0; /* Prevent footer from shrinking */
+        }
+
+        .btn-card {
+            padding: 9px 20px;
+            border-radius: 999px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Nunito', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            box-shadow: 0 4px 14px rgba(255, 107, 154, 0.12);
+            transition: transform 0.2s, box-shadow 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(255, 107, 154, 0.2); }
+        .btn-card:active { transform: scale(0.96); }
+        .btn-card:disabled { opacity: 0.4; cursor: default; transform: none; box-shadow: none; }
+
+        .btn-next-card { background: var(--accent-gradient); color: white; }
+        .btn-prev-card { background: rgba(255, 255, 255, 0.9); color: var(--muted); }
+
+        .btn-card svg { width: 14px; height: 14px; fill: currentColor; }
+
+        .page-indicator { color: #666; font-weight: 700; font-size: 0.85rem; }
+
+        /* Scrollbar */
+        .text-section::-webkit-scrollbar { width: 6px; }
+        .text-section::-webkit-scrollbar-thumb { background: var(--accent-gradient); border-radius: 6px; }
+
+        /* ===========================================
+           HEART BURST
+           =========================================== */
+        .heart-burst-container {
+            position: fixed;
+            inset: 0;
+            z-index: 100;
+            pointer-events: none;
+            display: none;
+        }
+
+        .heart-burst-container.active { display: block; }
+
+        .burst-heart { position: absolute; top: 50%; left: 50%; }
+        .burst-heart svg { fill: var(--hot-pink); }
+
+        /* ===========================================
+           ANIMATIONS
+           =========================================== */
+        .slide-in { animation: slideIn 0.56s cubic-bezier(.16, 1, .3, 1) both; }
+        .pop-in { animation: popIn 0.56s cubic-bezier(.16, 1, .3, 1) both; }
+
+        @keyframes slideIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+        @keyframes popIn { from { opacity: 0; transform: scale(.96) rotate(-2deg); } to { opacity: 1; transform: none; } }
+
+        /* ===========================================
+           RESPONSIVE - TABLET
+           =========================================== */
+        @media (max-width: 800px) {
+            .ide-filetree { display: none; }
+            .ide-sidebar { width: 38px; }
+            .sidebar-icon { width: 17px; height: 17px; }
+            .code-line { font-size: 0.72rem; line-height: 1.7; }
+            .line-num { width: 34px; padding-right: 10px; }
+            .btn-run { padding: 8px 16px; font-size: 0.82rem; }
+
+            .content-wrapper { flex-direction: column; gap: 12px; padding: 14px; }
+            
+            .photo-section { 
+                transform: none; 
+                width: 100%;
+                max-width: 100%;
+                height: auto; 
+                max-height: 250px; /* Cap image height on mobile */
+                flex: none; 
+            }
+
+            .photo-section img {
+                max-height: 250px;
+                width: auto;
+                margin: 0 auto;
+            }
+            
+            .text-section {
+                width: 100%;
+                flex: 1;
+                /* Ensure it takes remaining space for scrolling */
+                overflow-y: auto; 
+            }
+            
+            #phase-card { border-radius: 12px; }
+            .note { font-size: 0.95rem; padding: 8px; }
+        }
+
+        /* ===========================================
+           RESPONSIVE - SMALL MOBILE
+           =========================================== */
+        @media (max-width: 480px) {
+            body { align-items: flex-start; padding-top: 8px; }
+
+            #phase-ide { width: 100vw; max-height: 100vh; border-radius: 0; }
+            .ide-titlebar { padding: 8px 10px; }
+            .dot { width: 10px; height: 10px; }
+            .ide-sidebar { display: none; }
+            .ide-editor { padding: 12px 10px 12px 0; }
+            .code-line { font-size: 0.65rem; line-height: 1.65; }
+            .line-num { width: 28px; padding-right: 8px; font-size: 0.6rem; }
+            .ide-footer { padding: 8px 10px; flex-wrap: wrap; gap: 6px; }
+            .terminal-status { font-size: 0.65rem; }
+            .btn-run { padding: 7px 14px; font-size: 0.78rem; gap: 5px; }
+
+            #phase-card { width: 100vw; max-height: 100vh; border-radius: 0; }
+            .card-titlebar { padding: 10px 12px; }
+            .card-app-title { font-size: 0.85rem; }
+            .content-wrapper { padding: 10px; gap: 10px; flex-direction: column; }
+            
+            .photo-section { 
+                max-height: 220px; 
+                flex: none; 
+                transform: none; 
+            }
+            .photo-section img { max-height: 220px; }
+            
+            .note { font-size: 0.88rem; padding: 6px; line-height: 1.55; }
+            .card-footer { padding: 10px 12px; }
+            .btn-card { padding: 7px 14px; font-size: 0.85rem; }
+            .page-indicator { font-size: 0.78rem; }
+            .music-label { display: none; }
+        }
+
+        /* ===========================================
+           RESPONSIVE - VERY SMALL
+           =========================================== */
+        @media (max-width: 360px) {
+            .code-line { font-size: 0.6rem; line-height: 1.55; }
+            .line-num { width: 24px; padding-right: 6px; }
+            .photo-section { max-height: 180px; }
+            .photo-section img { max-height: 180px; }
+            .note { font-size: 0.82rem; }
+            .btn-card { padding: 6px 12px; font-size: 0.8rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ==============================
+         BACKGROUND: CODE RAIN (Phase 1)
+         ============================== -->
+    <div class="bg-canvas" id="bg-canvas"></div>
+
+    <!-- ==============================
+         BACKGROUND: VALENTINE (Phase 2)
+         ============================== -->
+    <div class="bg-valentine" id="bg-valentine"></div>
+
+    <!-- HEART BURST TRANSITION -->
+    <div class="heart-burst-container" id="heart-burst"></div>
+
+    <!-- ==============================
+             MUSIC PLAYER
+         ==============================
+         CHANGE THE MUSIC:
+         Replace the src below with your .mp3 file name.
+         Put the music file in the same folder as index.html.
+         ============================== -->
+    <audio id="bg-music" loop preload="auto">
+        <!-- === REPLACE THIS WITH YOUR MUSIC FILE === -->
+        <source src="surprise.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- ==================================
+         PHASE 1: THE PINK IDE
+         ================================== -->
+    <div id="phase-ide">
+
+        <div class="ide-titlebar">
+            <div class="dots">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+            </div>
+            <div class="ide-filename">
+                <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                MaryRose.java
+            </div>
+            <div style="width: 50px;"></div>
+        </div>
+
+        <div class="ide-body">
+
+            <!-- Sidebar icons -->
+            <div class="ide-sidebar">
+                <div class="sidebar-icon active">
+                    <svg viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                </div>
+                <div class="sidebar-icon">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.47 6.47 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                </div>
+                <div class="sidebar-icon">
+                    <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                </div>
+            </div>
+
+            <!-- File tree -->
+            <div class="ide-filetree">
+                <div class="filetree-header">Explorer</div>
+                <div class="filetree-item">
+                    <svg class="folder-icon" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                    src
+                </div>
+                <div class="filetree-item active" style="padding-left: 18px;">
+                    <svg class="file-icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+                    MaryRose.java
+                </div>
+                <div class="filetree-item" style="padding-left: 18px;">
+                    <svg class="file-icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+                    Surprise.java
+                </div>
+                <div class="filetree-item">
+                    <svg class="folder-icon" viewBox="0 0 24 24"><path d="M10 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8c0-1.1-.9-2-2-2h-8l-2-2z"/></svg>
+                    assets
+                </div>
+                <div class="filetree-item" style="padding-left: 18px;">
+                    <svg class="file-icon" viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-2 .9-2 2v16c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V8l-6-6zm-1 7V3.5L18.5 9H13z"/></svg>
+                    surprise.mp3
+                </div>
+            </div>
+
+            <!-- THE CODE EDITOR -->
+            <div class="ide-editor">
+                <div class="code-line"><span class="line-num">1</span><span class="line-content"><span class="cm">// A little program for the best teacher</span></span></div>
+                <div class="code-line"><span class="line-num">2</span><span class="line-content"><span class="cm">// Ma'am Mary Rose Rosaroso</span></span></div>
+                <div class="code-line"><span class="line-num">3</span><span class="line-content"></span></div>
+                <div class="code-line"><span class="line-num">4</span><span class="line-content"><span class="kw">public class</span> <span class="ty">MaryRose</span> <span class="br">{</span></span></div>
+                <div class="code-line"><span class="line-num">5</span><span class="line-content"><span class="indent i1"></span><span class="kw">public static void</span> <span class="fn">main</span><span class="br">(</span><span class="ty">String</span><span class="br">[]</span> args<span class="br">)</span> <span class="br">{</span></span></div>
+                <div class="code-line"><span class="line-num">6</span><span class="line-content"></span></div>
+                <div class="code-line"><span class="line-num">7</span><span class="line-content"><span class="indent i2"></span><span class="ty">String</span> teacher = <span class="str">"Ma'am Mary Rose Rosaroso"</span>;</span></div>
+                <div class="code-line"><span class="line-num">8</span><span class="line-content"><span class="indent i2"></span><span class="ty">String</span> section = <span class="str">"12 Barbera 2025-2026"</span>;</span></div>
+                <div class="code-line"><span class="line-num">9</span><span class="line-content"><span class="indent i2"></span><span class="kw">boolean</span> bestTeacher = <span class="kw">true</span>;</span></div>
+                <div class="code-line"><span class="line-num">10</span><span class="line-content"></span></div>
+                <div class="code-line"><span class="line-num">11</span><span class="line-content"><span class="indent i2"></span><span class="kw">while</span> <span class="br">(</span>bestTeacher<span class="br">)</span> <span class="br">{</span></span></div>
+                <div class="code-line"><span class="line-num">12</span><span class="line-content"><span class="indent i3"></span><span class="ty">System</span>.out.<span class="fn">println</span><span class="br">(</span></span></div>
+                <div class="code-line"><span class="line-num">13</span><span class="line-content"><span class="indent i3"></span>  <span class="str">"Thank you for the debugging help! &lt;3"</span></span></div>
+                <div class="code-line"><span class="line-num">14</span><span class="line-content"><span class="indent i3"></span><span class="br">)</span>;</span></div>
+                <div class="code-line"><span class="line-num">15</span><span class="line-content"><span class="indent i2"></span><span class="br">}</span></span></div>
+                <div class="code-line"><span class="line-num">16</span><span class="line-content"></span></div>
+                <div class="code-line"><span class="line-num">17</span><span class="line-content"><span class="indent i2"></span><span class="cm">// This loop never ends,</span></span></div>
+                <div class="code-line"><span class="line-num">18</span><span class="line-content"><span class="indent i2"></span><span class="cm">// just like our gratitude.</span></span></div>
+                <div class="code-line"><span class="line-num">19</span><span class="line-content"><span class="indent i2"></span><span class="cm">// Click RUN to see your surprise!</span></span></div>
+                <div class="code-line"><span class="line-num">20</span><span class="line-content"></span></div>
+                <div class="code-line"><span class="line-num">21</span><span class="line-content"><span class="indent i1"></span><span class="br">}</span></span></div>
+                <div class="code-line"><span class="line-num">22</span><span class="line-content"><span class="br">}</span></span></div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="ide-footer">
+            <div class="terminal-status">
+                <svg viewBox="0 0 24 24"><path d="M20 4H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 14H4V8h16v12zM6 10l4 3-4 3v-6z"/></svg>
+                TERMINAL
+            </div>
+            <button class="btn-run" id="btn-run" onclick="runCode()">
+                <svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                RUN CODE
+            </button>
+        </div>
+
+        <!-- Compile overlay -->
+        <div class="compile-overlay" id="compile-overlay">
+            <div class="compile-text" id="compile-text">Compiling MaryRose.java ...</div>
+            <div class="compile-bar">
+                <div class="compile-fill" id="compile-fill"></div>
+            </div>
+            <div class="terminal-lines" id="terminal-lines"></div>
+        </div>
+    </div>
+
+    <!-- ==================================
+         PHASE 2: THE VALENTINE CARD
+         ================================== -->
+    <div id="phase-card">
+
+        <div class="card-titlebar">
+            <div class="dots">
+                <div class="dot dot-red"></div>
+                <div class="dot dot-yellow"></div>
+                <div class="dot dot-green"></div>
+            </div>
+            <div class="card-app-title" id="card-title">class_memories_v1.0</div>
+
+            <!-- MUSIC TOGGLE -->
+            <div class="music-controls">
+                <span class="music-label" id="music-label">Music</span>
+                <button class="btn-music" id="btn-music" onclick="toggleMusic()" title="Toggle Music">
+                    <!-- Speaker icon (plays/pauses) -->
+                    <svg id="icon-music-on" viewBox="0 0 24 24"><path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z"/></svg>
+                    <svg id="icon-music-off" viewBox="0 0 24 24" style="display:none"><path d="M16.5 12c0-1.77-1.02-3.29-2.5-4.03v2.21l2.45 2.45c.03-.2.05-.41.05-.63zm2.5 0c0 .94-.2 1.82-.54 2.64l1.51 1.51C20.63 14.91 21 13.5 21 12c0-4.28-2.99-7.86-7-8.77v2.06c2.89.86 5 3.54 5 6.71zM4.27 3L3 4.27 7.73 9H3v6h4l5 5v-6.73l4.25 4.25c-.67.52-1.42.93-2.25 1.18v2.06c1.38-.31 2.63-.95 3.69-1.81L19.73 21 21 19.73l-9-9L4.27 3zM12 4L9.91 6.09 12 8.18V4z"/></svg>
+                </button>
+            </div>
+        </div>
+
+        <div class="content-wrapper" id="content-box">
+            <div class="photo-section pop-in" id="photo-area">
+                <!-- ==========================================
+                     CHANGE THE IMAGE:
+                     Images are set via the JS slides array below.
+                     ========================================== -->
+                <img id="display-img" src="" alt="Photo">
+            </div>
+
+            <div class="text-section slide-in" id="text-area">
+                <div class="note" id="display-text"></div>
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <button class="btn-card btn-prev-card" id="prev-btn" onclick="navigate(-1)">
+                <svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>
+                Back
+            </button>
+            <div class="page-indicator" id="page-num">1 / 10</div>
+            <button class="btn-card btn-next-card" id="next-btn" onclick="navigate(1)">
+                Next
+                <svg viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>
+            </button>
+        </div>
+    </div>
+
+
+    <script>
+        /* =======================================
+           1. EDIT YOUR SLIDES
+           =======================================
+           Each slide has: text + image.
+           ADD, REMOVE, or CHANGE any slide.
+           The LAST slide after these is the
+           long final letter.
+           ======================================= */
+
+        const slides = [
+            /* --- SLIDE 1: GREETING --- */
+            {
+                text: "Happy Valentine's Day, Ma'am Mary Rose Rosaroso!\nFrom your students of 12 Barbera 2025-2026.\nWe made this surprise just for you.",
+                image: "val4.jpg"
+            },
+            /* --- SLIDE 2 --- */
+            {
+                text: "Thank you for teaching us that mistakes are just 'undocumented features'.\nYou never gave up on us, even when our code had more bugs than a rainforest.",
+                image: "val2.png"
+            },
+            /* --- SLIDE 3 --- */
+            {
+                text: "Your patience is infinite.\nThank you for helping us debug our code and our lives.",
+                image: "val3.png"
+            },
+
+            /* --- NEW IMAGES WITH MESSAGES --- */
+
+            /* --- SLIDE 4: APPRECIATION --- */
+            {
+                text: "You taught us that every error is a lesson.\nBecause of you, we learned to never give up on a problem.\nThank you for believing in us, Ma'am.",
+                image: "553677876_1140749997442799_1720543039582234390_n.jpg"
+            },
+            /* --- SLIDE 5 --- */
+            {
+                text: "We know we are not the easiest class to handle.\nWe are noisy. We are chaotic. We are sometimes the worst section.\nBut you stayed. You taught. You cared.\nAnd for that, we are truly grateful.",
+                image: "553690351_1147367463394079_6585022093824558490_n.jpg"
+            },
+            /* --- SLIDE 6: SORRY --- */
+            {
+                text: "Ma'am, we are sorry for being noisy during your lessons.\nSorry for the times we made your job harder than it should be.\nWe know we can be a handful, and we are truly sorry.\nYou deserve a much better class, but we promise to try harder.",
+                image: "553984024_809205005284414_2435756387350626832_n.jpg"
+            },
+            /* --- SLIDE 7 --- */
+            {
+                text: "Despite everything, you still smile at us every day.\nYou still explain the lesson one more time.\nYou still check if we understand.\nThat means the world to us.",
+                image: "554019900_1105818438366772_3233107480998725927_n.jpg"
+            },
+            /* --- SLIDE 8 --- */
+            {
+                text: "They say actions speak louder than words.\nSo here we are, writing code to say:\nThank you, Ma'am. We appreciate you more than our code can express.",
+                image: "554254498_2024059468132174_8710651050655229188_n.jpg"
+            },
+            /* --- SLIDE 9 --- */
+            {
+                text: "From debugging our programs to debugging our attitudes,\nyou have done it all.\nHappy Valentine's Day, Ma'am.\nYou are the best teacher we could ever ask for.",
+                image: "557973510_763343183371907_5248272259832328143_n.jpg"
+            }
+        ];
+
+
+        /* =======================================
+           2. EDIT THE FINAL LETTER
+           ======================================= */
+
+        /* --- CHANGE THE TEACHER NAME BELOW --- */
+        const teacherName = "Ma'am Mary Rose Rosaroso";
+
+        /* --- CHANGE THE SECTION NAME BELOW --- */
+        const sectionName = "Section 12 Barbera 2025-2026";
+
+        const longMessage = `Dear ${teacherName},
+
+Happy Valentine’s Day!
+
+We wanted to create something simple and sincere to show how much we appreciate you. You make Computer Programming a place where we feel at home, and we are so grateful for your presence in our lives.
+
+Thank you for:
+
+Thank you for always being there for us during our school events.
+
+Helping us through every challenge, whether it’s a difficult lesson or a long day.
+
+Being a second mother to all of us—someone we can lean on and trust.
+
+Not giving up on us, even when we were noisy and hard to manage.
+
+We know we can be a handful sometimes. We are truly sorry for the noise, the chaos, and for being a difficult section to handle. But please know that behind all the noise, we are listening, and we truly care about you.
+
+You deserve so much more than a simple website, but we hope this small gesture shows you how much you mean to us. We pray for a healthy life and a good lifestyle for you. May God bless you always with more and more blessings in the years to come.
+
+With all our love and gratitude,
+
+
+${sectionName}`;
+
+        /* --- THE FINAL GROUP PHOTO --- */
+        const finalPhoto = "val1.jpg";
+
+
+        /* =======================================
+           BACKGROUND: CODE FRAGMENTS
+           ======================================= */
+
+        const codeSnippets = [
+            'while(true) { appreciate(); }',
+            'if (teacher == "best") return;',
+            'System.out.println("Thank you!");',
+            'boolean grateful = true;',
+            'try { understand(); } catch(e) {}',
+            '// TODO: thank Ma\'am more',
+            'int patience = Integer.MAX_VALUE;',
+            'String mood = "inspired";',
+            'for (day : schoolYear) { learn(); }',
+            'return "appreciation";',
+        ];
+
+        function spawnCodeFragments() {
+            const canvas = document.getElementById('bg-canvas');
+            for (let i = 0; i < 16; i++) {
+                const frag = document.createElement('div');
+                frag.className = 'code-fragment';
+                frag.textContent = codeSnippets[Math.floor(Math.random() * codeSnippets.length)];
+                frag.style.left = Math.random() * 100 + '%';
+                frag.style.animationDuration = (18 + Math.random() * 22) + 's';
+                frag.style.animationDelay = (Math.random() * 20) + 's';
+                frag.style.fontSize = (0.6 + Math.random() * 0.25) + 'rem';
+                canvas.appendChild(frag);
+            }
+        }
+        spawnCodeFragments();
+
+
+        /* =======================================
+           BACKGROUND: FLOATING HEARTS (Phase 2)
+           ======================================= */
+
+        function spawnFloatingHearts() {
+            const bg = document.getElementById('bg-valentine');
+            for (let i = 0; i < 20; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                const size = 14 + Math.random() * 24;
+                heart.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.animationDuration = (12 + Math.random() * 18) + 's';
+                heart.style.animationDelay = (Math.random() * 14) + 's';
+                bg.appendChild(heart);
+            }
+        }
+        spawnFloatingHearts();
+
+
+        /* =======================================
+           HEART BURST TRANSITION
+           ======================================= */
+
+        function triggerHeartBurst() {
+            const container = document.getElementById('heart-burst');
+            container.innerHTML = '';
+            container.classList.add('active');
+
+            for (let i = 0; i < 30; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'burst-heart';
+                const size = 12 + Math.random() * 20;
+                heart.innerHTML = `<svg width="${size}" height="${size}" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>`;
+
+                const angle = (Math.PI * 2 / 30) * i + (Math.random() - 0.5) * 0.5;
+                const distance = 120 + Math.random() * 300;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+
+                heart.animate([
+                    { transform: 'translate(-50%, -50%) scale(0)', opacity: 1 },
+                    { transform: `translate(calc(-50% + ${tx}px), calc(-50% + ${ty}px)) scale(1) rotate(${Math.random()*60-30}deg)`, opacity: 0 }
+                ], {
+                    duration: 800 + Math.random() * 400,
+                    easing: 'cubic-bezier(0.16, 1, 0.3, 1)',
+                    fill: 'forwards'
+                });
+
+                container.appendChild(heart);
+            }
+
+            setTimeout(() => {
+                container.classList.remove('active');
+                container.innerHTML = '';
+            }, 1600);
+        }
+
+
+        /* =======================================
+           MUSIC CONTROL
+           ======================================= */
+
+        let musicPlaying = false;
+        const audioEl = document.getElementById('bg-music');
+        const iconOn = document.getElementById('icon-music-on');
+        const iconOff = document.getElementById('icon-music-off');
+        const musicLabel = document.getElementById('music-label');
+
+        // Set volume to 70% to avoid being too loud
+        audioEl.volume = 0.7;
+
+        function toggleMusic() {
+            if (musicPlaying) {
+                audioEl.pause();
+                musicPlaying = false;
+                iconOn.style.display = 'none';
+                iconOff.style.display = 'block';
+                musicLabel.textContent = 'Muted';
+            } else {
+                audioEl.play().catch(err => {
+                    console.error('Music play failed:', err);
+                    alert('Could not play music. Make sure surprise.mp3 is in the folder.');
+                });
+                musicPlaying = true;
+                iconOn.style.display = 'block';
+                iconOff.style.display = 'none';
+                musicLabel.textContent = 'Playing';
+            }
+        }
+
+        function startMusic() {
+            // Reset audio to beginning
+            audioEl.currentTime = 0;
+            
+            audioEl.play().then(() => {
+                musicPlaying = true;
+                iconOn.style.display = 'block';
+                iconOff.style.display = 'none';
+                musicLabel.textContent = 'Playing';
+                console.log('Music started successfully');
+            }).catch(err => {
+                console.error('Music autoplay failed:', err);
+                // Show user-friendly message
+                musicPlaying = false;
+                iconOn.style.display = 'none';
+                iconOff.style.display = 'block';
+                musicLabel.textContent = 'Click to play';
+                
+                // If file doesn't exist, show alert
+                if (err.name === 'NotSupportedError' || err.message.includes('404')) {
+                    setTimeout(() => {
+                        alert('Music file "surprise.mp3" not found. Please add it to the folder.');
+                    }, 500);
+                }
+            });
+        }
+
+
+        /* =======================================
+           COMPILE ANIMATION & TRANSITION
+           ======================================= */
+
+        function runCode() {
+            // Start music immediately on user interaction
+            startMusic();
+
+            const overlay = document.getElementById('compile-overlay');
+            const fill = document.getElementById('compile-fill');
+            const compileText = document.getElementById('compile-text');
+            const termLines = document.getElementById('terminal-lines');
+            const btnRun = document.getElementById('btn-run');
+
+            btnRun.disabled = true;
+            btnRun.style.opacity = '0.5';
+            overlay.classList.add('active');
+            fill.style.width = '0%';
+            termLines.innerHTML = '';
+
+            const steps = [
+                { pct: 15, text: '> javac MaryRose.java', delay: 400 },
+                { pct: 35, text: '> Loading appreciation module...', delay: 600 },
+                { pct: 55, text: '> Injecting gratitude beans...', delay: 500 },
+                { pct: 75, text: '> Building valentine.jar...', delay: 500 },
+                { pct: 90, text: '> Linking heart dependencies...', delay: 400 },
+                { pct: 100, text: '<span class="success">> BUILD SUCCESSFUL</span>', delay: 500 },
+            ];
+
+            let total = 0;
+            steps.forEach((step, i) => {
+                total += step.delay;
+                setTimeout(() => {
+                    fill.style.width = step.pct + '%';
+                    termLines.innerHTML += step.text + '<br>';
+                    if (i === steps.length - 1) {
+                        compileText.textContent = 'Build Successful!';
+                    }
+                }, total);
+            });
+
+            setTimeout(() => { transitionToCard(); }, total + 700);
+        }
+
+        function transitionToCard() {
+            const ide = document.getElementById('phase-ide');
+            const card = document.getElementById('phase-card');
+            const bgVal = document.getElementById('bg-valentine');
+
+            triggerHeartBurst();
+            ide.classList.add('hidden');
+
+            setTimeout(() => { bgVal.classList.add('active'); }, 300);
+
+            setTimeout(() => {
+                card.style.display = 'flex';
+                void card.offsetWidth;
+                card.classList.add('visible');
+                updateUI();
+                // Music already started in runCode()
+            }, 600);
+        }
+
+
+        /* =======================================
+           CARD SLIDESHOW
+           ======================================= */
+
+        let currentIndex = 0;
+        const totalPages = slides.length + 1; // +1 for the final letter
+
+        const contentBox = document.getElementById('content-box');
+        const photoArea = document.getElementById('photo-area');
+        const textArea = document.getElementById('text-area');
+        const imgEl = document.getElementById('display-img');
+        const textEl = document.getElementById('display-text');
+        const cardTitle = document.getElementById('card-title');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const pageNum = document.getElementById('page-num');
+
+        function updateUI() {
+            pageNum.innerText = `${currentIndex + 1} / ${totalPages}`;
+
+            prevBtn.disabled = (currentIndex === 0);
+
+            if (currentIndex === totalPages - 1) {
+                nextBtn.innerHTML = 'End';
+                nextBtn.disabled = true;
+                nextBtn.style.background = '#ddd';
+                nextBtn.style.color = '#999';
+            } else {
+                nextBtn.innerHTML = 'Next <svg style="width:14px;height:14px;fill:currentColor;vertical-align:-2px;margin-left:4px" viewBox="0 0 24 24"><path d="M12 4l-1.41 1.41L16.17 11H4v2h12.17l-5.58 5.59L12 20l8-8z"/></svg>';
+                nextBtn.disabled = false;
+                nextBtn.style.background = 'linear-gradient(135deg, #ff6b9a, #ffb199)';
+                nextBtn.style.color = 'white';
+            }
+
+            if (currentIndex === slides.length) {
+                // Final letter slide
+                contentBox.classList.add('final-mode');
+                cardTitle.innerText = 'final_letter.txt';
+                imgEl.src = finalPhoto;
+                textEl.innerText = longMessage;
+            } else {
+                contentBox.classList.remove('final-mode');
+                cardTitle.innerText = 'class_memories_v1.0';
+                imgEl.src = slides[currentIndex].image;
+                textEl.innerText = slides[currentIndex].text;
+            }
+
+            resetAnimation(photoArea, 'pop-in');
+            resetAnimation(textArea, 'slide-in');
+        }
+
+        function resetAnimation(el, cls) {
+            el.classList.remove(cls);
+            void el.offsetWidth;
+            el.classList.add(cls);
+        }
+
+        function navigate(dir) {
+            currentIndex += dir;
+            if (currentIndex < 0) currentIndex = 0;
+            if (currentIndex >= totalPages) currentIndex = totalPages - 1;
+            updateUI();
+        }
+    </script>
+
+</body>
+</html>
