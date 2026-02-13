@@ -1,0 +1,270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teacher Appreciation OS</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700&family=VT323&display=swap" rel="stylesheet">
+
+    <style>
+        :root{
+            --glass-bg: rgba(255,255,255,0.72);
+            --accent-1: #ff6b9a;
+            --accent-2: #ffb199;
+            --muted: #5a5a5a;
+            --glass-border: rgba(255,255,255,0.85);
+        }
+
+        /* --- CORE LAYOUT --- */
+        html,body{
+            height:100%;
+            margin:0;
+            font-family: 'Nunito', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+            background: linear-gradient(180deg,#f7eef7 0%, #fff 60%);
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+        }
+
+        body { display:flex; align-items:center; justify-content:center; padding:40px 20px; }
+
+        /* --- VIDEO BACKGROUND --- */
+        #bg-video{
+            position:fixed; inset:0; width:100%; height:100%; object-fit:cover; z-index:0; filter:brightness(0.85) contrast(1.02);
+        }
+        .video-overlay{ position:fixed; inset:0; z-index:1; pointer-events:none; background: linear-gradient(180deg, rgba(0,0,0,0.12), rgba(255,255,255,0.02)); }
+
+        /* --- THE GLASS WINDOW --- */
+        .window{
+            width: min(1100px, 98%);
+            max-height: 92vh;
+            background: var(--glass-bg);
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(10px) saturate(1.05);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 16px;
+            box-shadow: 0 20px 40px rgba(16,24,40,0.15);
+            display:flex; flex-direction:column; overflow:hidden;
+        }
+
+        .header{ padding:14px 20px; display:flex; align-items:center; justify-content:space-between; gap:12px; }
+        .dots{ display:flex; gap:8px; align-items:center; }
+        .dot{ width:12px; height:12px; border-radius:50%; box-shadow:0 4px 10px rgba(0,0,0,0.08); }
+        .red{ background:#ff5f57 } .yellow{ background:#ffbd2e } .green{ background:#28c940 }
+
+        .app-title{ font-family:'VT323', monospace; font-size:1.35rem; color:var(--muted); }
+
+        /* --- CONTENT --- */
+        .content-wrapper{ display:flex; gap:22px; padding:22px; flex:1; align-items:stretch; }
+
+        .photo-section{ flex:1; min-width:200px; border-radius:12px; overflow:hidden; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.85); box-shadow: 0 8px 18px rgba(16,24,40,0.06); transform:rotate(-1.5deg); }
+        .photo-section img{ width:100%; height:100%; object-fit:cover; display:block; }
+
+        .final-mode .photo-section{ flex:0.9; transform:none; }
+
+        .text-section{ flex:1.1; display:flex; flex-direction:column; justify-content:center; }
+        .note{ background:transparent; padding:18px; border-radius:10px; font-size:1.05rem; line-height:1.6; color:#222; }
+
+        .final-mode .text-section{ overflow:auto; padding:6px 4px 6px 6px; }
+
+        /* --- FOOTER --- */
+        .footer{ display:flex; align-items:center; justify-content:space-between; padding:14px 18px; background:transparent; border-top:1px solid rgba(0,0,0,0.04); }
+
+        button{ padding:10px 20px; border-radius:999px; border:none; cursor:pointer; font-family:'VT323', monospace; font-size:1.05rem; box-shadow:0 6px 14px rgba(16,24,40,0.08); }
+        .btn-next{ background:linear-gradient(90deg,var(--accent-1),var(--accent-2)); color:white; }
+        .btn-prev{ background:rgba(255,255,255,0.9); color:var(--muted); }
+
+        /* Animations */
+        .slide-in{ animation: slideIn 0.56s cubic-bezier(.16,1,.3,1) both }
+        .pop-in{ animation: popIn 0.56s cubic-bezier(.16,1,.3,1) both }
+        @keyframes slideIn{ from{ opacity:0; transform:translateY(8px)} to{ opacity:1; transform:none } }
+        @keyframes popIn{ from{ opacity:0; transform:scale(.98) rotate(-2deg)} to{ opacity:1; transform:none } }
+
+        /* Scrollbar */
+        .text-section::-webkit-scrollbar{ width:8px }
+        .text-section::-webkit-scrollbar-thumb{ background: linear-gradient(180deg,var(--accent-1),var(--accent-2)); border-radius:6px }
+
+        /* --- RESPONSIVE --- */
+        @media (max-width:800px){
+            .content-wrapper{ flex-direction:column; gap:14px; padding:16px; }
+            .photo-section{ transform:none; height:260px }
+            .window{ border-radius:12px }
+            .app-title{ font-size:1.1rem }
+            body{ padding:24px }
+        }
+
+        @media (max-width:420px){
+            .photo-section{ height:200px }
+            .note{ font-size:0.98rem }
+            button{ padding:8px 14px; font-size:0.95rem }
+        }
+    </style>
+</head>
+<body>
+
+    <video autoplay muted loop id="bg-video">
+        <source src="barbera.mp4" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+
+    <div class="window">
+        <div class="header">
+            <div class="dots">
+                <div class="dot red"></div>
+                <div class="dot yellow"></div>
+                <div class="dot green"></div>
+            </div>
+            <div class="app-title" id="app-title">class_memories_v1.0</div>
+            <div style="width: 50px;"></div>
+        </div>
+
+        <div class="content-wrapper" id="content-box">
+            
+            <div class="photo-section pop-in" id="photo-area">
+                <img id="display-img" src="" alt="Teacher Photo">
+            </div>
+
+            <div class="text-section slide-in" id="text-area">
+                <div class="note" id="display-text">
+                    </div>
+            </div>
+
+        </div>
+
+        <div class="footer">
+            <button class="btn-prev" id="prev-btn" onclick="navigate(-1)">Back</button>
+            <div style="color: #444; font-weight: bold;" id="page-num">1 / 4</div>
+            <button class="btn-next" id="next-btn" onclick="navigate(1)">Next ></button>
+        </div>
+    </div>
+
+    <script>
+        /* =======================================
+           --- 1. EDIT YOUR SHORT NOTES (Slides 1-3) ---
+           ======================================= */
+        
+        const slides = [
+            {
+                text: "Happy Valentine's Day! We made this 'Glass OS' card just for you.",
+                image: "val4.png"
+            },
+            {
+                text: "Thank you for teaching us that mistakes are just 'undocumented features'.",
+                image: "val2.png"
+            },
+            {
+                text: "Your patience is infinite. Thank you for helping us debug our code.",
+                image: "val3.png"
+            }
+        ];
+
+        /* =======================================
+           --- 2. EDIT YOUR LONG LETTER (Final Slide) ---
+           ======================================= */
+        // This will be displayed ON THE SAME SCREEN as the final photo.
+        
+        const longMessage = `Dear Teacher,
+
+Happy Valentine's Day! ❤️
+
+We wanted to create something special to show our appreciation for everything you do. You make Computer Science fun, engaging, and (mostly) understandable!
+
+Thank you for:
+1. Always answering our questions, no matter how basic.
+2. Helping us find those missing semicolons.
+3. Being a supportive mentor to all of us.
+
+We know we can be a handful sometimes, but we truly appreciate the effort you put into every lesson.
+
+We hope you have a relaxing day filled with compiled code and zero runtime errors.
+
+With love,
+Your Students`;
+
+        // THE FINAL GROUP PHOTO FILENAME
+        const finalPhoto = "val1.png"; 
+
+        /* =======================================
+           --- LOGIC ---
+           ======================================= */
+
+        let currentIndex = 0;
+        // Total pages = slides + 1 final page
+        const totalPages = slides.length + 1;
+
+        // Elements
+        const contentBox = document.getElementById("content-box");
+        const photoArea = document.getElementById("photo-area");
+        const textArea = document.getElementById("text-area");
+        
+        const imgEl = document.getElementById("display-img");
+        const textEl = document.getElementById("display-text");
+        const appTitle = document.getElementById("app-title");
+        
+        const prevBtn = document.getElementById("prev-btn");
+        const nextBtn = document.getElementById("next-btn");
+        const pageNum = document.getElementById("page-num");
+
+        function updateUI() {
+            pageNum.innerText = `${currentIndex + 1} / ${totalPages}`;
+
+            prevBtn.disabled = (currentIndex === 0);
+            prevBtn.style.opacity = (currentIndex === 0) ? "0.5" : "1";
+
+            if (currentIndex === totalPages - 1) {
+                nextBtn.innerText = "End.";
+                nextBtn.disabled = true;
+                nextBtn.style.background = "#ddd";
+            } else {
+                nextBtn.innerText = "Next >";
+                nextBtn.disabled = false;
+                nextBtn.style.background = "linear-gradient(45deg, #ff69b4, #ff9a9e)";
+            }
+
+            // Detect if it is the Final Slide
+            if (currentIndex === slides.length) {
+                // --- FINAL MODE (Photo + Letter) ---
+                contentBox.classList.add("final-mode");
+                appTitle.innerText = "final_letter.txt";
+
+                // Set content
+                imgEl.src = finalPhoto;       // The group photo
+                textEl.innerText = longMessage; // The long letter
+                
+                // Reset Animations
+                resetAnimation(photoArea, "pop-in");
+                resetAnimation(textArea, "slide-in");
+
+            } else {
+                // --- NORMAL MODE (Slides 1-3) ---
+                contentBox.classList.remove("final-mode");
+                appTitle.innerText = "class_memories_v1.0";
+
+                imgEl.src = slides[currentIndex].image;
+                textEl.innerText = slides[currentIndex].text;
+
+                resetAnimation(photoArea, "pop-in");
+                resetAnimation(textArea, "slide-in");
+            }
+        }
+
+        function resetAnimation(element, className) {
+            element.classList.remove(className);
+            void element.offsetWidth; 
+            element.classList.add(className);
+        }
+
+        function navigate(direction) {
+            currentIndex += direction;
+            if (currentIndex < 0) currentIndex = 0;
+            if (currentIndex >= totalPages) currentIndex = totalPages - 1;
+            updateUI();
+        }
+
+        updateUI();
+
+    </script>
+</body>
+</html>
